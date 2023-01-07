@@ -41,29 +41,59 @@ int get(HashMap* h, int key){
     return INT_MAX;
 }
 
-int main() {
+
+HashMap create(int* keys, int* values, int length){
     HashMap hashMap;
-    hashMap.size = 10;
+    hashMap.size = length * 2;
     hashMap.KPtr = calloc(hashMap.size, sizeof(int));
     hashMap.VPtr = calloc(hashMap.size, sizeof(int));
 
-    add(&hashMap, 1, 10);
-    add(&hashMap, 2, 20);
-    add(&hashMap, 3, 30);
-    add(&hashMap, 4, 40);
-    add(&hashMap, 5, 50);
-    add(&hashMap, 6, 60);
-    add(&hashMap, 7, 70);
-    add(&hashMap, 8, 80);
+    for (int i = 0; i < length; i ++){
+        add(&hashMap, keys[i], values[i]);
+    }
+    return hashMap;
+}
 
+
+void rehash(HashMap* hashMap, int size){
+    int oldSize = hashMap->size;
+    int keys[hashMap->size];
+    int values[hashMap->size];
+
+    for (int i = 0; i < hashMap->size; i++){
+        keys[i] = hashMap->KPtr[i];
+        values[i] = hashMap->VPtr[i];
+        hashMap->KPtr[i] = 0;
+        hashMap->VPtr[i] = 0;
+    }
+
+    hashMap->size = 2 * size;
+    hashMap->KPtr = calloc(hashMap->size, sizeof(int));
+    hashMap->VPtr = calloc(hashMap->size, sizeof(int));
+
+    for (int i = 0; i < oldSize; i ++){
+        add(hashMap, keys[i], values[i]);
+    }
+}
+
+
+int main() {
+
+    int keys[] = {1, 2, 3, 4, 5, 6};
+    int values[] = {10, 20, 30, 40, 50, 60};
+
+    HashMap hashMap = create(keys, values, sizeof(values) / sizeof(int));
 
     for (int i = 0; i < hashMap.size; ++i){
         printf("%d, ", hashMap.VPtr[i]);
     }
     printf("\n");
 
-    printf("%d", get(&hashMap, -1));
+    rehash(&hashMap, 15);
 
+    for (int i = 0; i < hashMap.size; ++i){
+        printf("%d, ", hashMap.VPtr[i]);
+    }
 
     return 0;
 }
